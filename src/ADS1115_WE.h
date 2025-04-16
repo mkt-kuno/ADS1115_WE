@@ -330,6 +330,7 @@ class ADS1115_WE
         int16_t calcLimit(float rawLimit);
         uint8_t writeRegister(uint8_t reg, uint16_t val);
         uint16_t readRegister(uint8_t reg);
+        uint16_t previousConfReg;
     };
 #endif
 
