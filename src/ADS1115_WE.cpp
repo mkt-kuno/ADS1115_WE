@@ -30,11 +30,13 @@ void ADS1115_WE::reset(){
 
 bool ADS1115_WE::init(bool ads1015){
     useADS1015 = ads1015;
-
+    
     if(isDisconnected()){
         return 0;
     }
     writeRegister(ADS1115_CONFIG_REG, ADS1115_REG_RESET_VAL);
+    this->previousConfReg = ADS1115_REG_RESET_VAL;
+
     setVoltageRange_mV(ADS1115_RANGE_2048);
     writeRegister(ADS1115_LO_THRESH_REG, 0x8000);
     writeRegister(ADS1115_HI_THRESH_REG, 0x7FFF);
@@ -116,7 +118,7 @@ void ADS1115_WE::setMeasureMode(ADS1115_MEASURE_MODE mode){
 
 void ADS1115_WE::setVoltageRange_mV(ADS1115_RANGE range){
     uint16_t currentVoltageRange = voltageRange;
-\    uint16_t currentConfReg = this->previousConfReg;
+    uint16_t currentConfReg = this->previousConfReg;
     uint16_t currentRange = (currentConfReg >> 9) & 7;
     uint16_t currentAlertPinMode = currentConfReg & 3;
     
@@ -162,7 +164,6 @@ void ADS1115_WE::setVoltageRange_mV(ADS1115_RANGE range){
 }
 
 void ADS1115_WE::setAutoRange(){
-    //uint16_t currentConfReg = readRegister(ADS1115_CONFIG_REG);
     uint16_t currentConfReg = this->previousConfReg;
     setVoltageRange_mV(ADS1115_RANGE_6144);
     
@@ -301,8 +302,7 @@ void ADS1115_WE::setSingleChannel(size_t channel) {
 
 bool ADS1115_WE::isBusy(){
     if(deviceMeasureMode == ADS1115_SINGLE){
-        uint16_t currentConfReg = readRegister(ADS1115_CONFIG_REG);
-        return (!(currentConfReg>>15) & 1);
+        return (!(readRegister(ADS1115_CONFIG_REG)>>15) & 1);
     }
     else return 0;
 }
